@@ -49,11 +49,11 @@ class DaoProductos {
             break;
             case 3:
             $limite = '';
-            $tipo = 'precio_oferta > 0';
+            $tipo = 'precio_oferta > 0 AND vigente = 1';
             break;
             case 4:
             $limite = '';
-            $tipo = 'fecha_agregado > date_sub( now(), interval 2 month) order by fecha_agregado desc';
+            $tipo = 'fecha_agregado > date_sub( now(), interval 2 month) order by fecha_agregado desc AND vigente = 1';
             break;            
         }         
         
