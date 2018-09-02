@@ -35,12 +35,12 @@
 0035" G E N - R O D "         
 0036FUSIBLES FICHA DESNUDOS   
 0037" R U L E M A N E S "     
-0038FILTROS PARA AIRE " A L K 
+0038" T R I C O "             
 0039" C A S E R O S "         
 0040TERMOSTATOS Y BULBOS WAHLE
 0041ARTICULOS SIN STOCK       
 0042DSFSD                     
-0043" C A R B O N E S  D O N O
+0043" D O N O N "             
 0044" O S "                   
 0045" D O G "                 
 0046" N O S S O "             
@@ -54,44 +54,45 @@
 0054" M O S S "               
 0055" E L O D "               
 0056" S I L I S O L "         
-0057" S I L I S O L "         
-0058" R A L U X "             
-0059" T E V E F L E X "       
-0060" S C H I N C A "         
+0057" L O C X "               
+0058" S I L I S O L "         
+0059" R A L U X "             
+0060" T E V E F L E X "       
 0061" S C H I N C A "         
 0062" S C H I N C A "         
-0063" S C H I N C A " OFERTAS 
-0064" F L E X I C A M P "     
-0065" F I S P A "             
-0066" P R E C I N T O S  GW " 
-0067FIN                       
-0068" M A R C O "             
-0069REFORMA "R T"             
-0070" B E R U "               
-0071" H A Z E T "             
-0072" V I G O R "             
-0073CINTA                     
-0074DESTELLADORES  R T M      
-0075" T R I A "               
-0076" E R A L S A "           
-0077" Z E N U N "             
-0078MAXICAP                   
-0079" S C H I N C A "         
-0080" Z H "                   
-0081" F A M E A "             
-0082" D A Y C O "             
-0083" B I F O C "             
-0084" V E Y P A "             
-0085" G A R E F "             
-0086" B y C "                 
-0087CAMPOS DE OFERTA          
-0088" E S T A N O L I N "     
-0089J A E G E R               
-0090DIODOS ALTERN - SIN FIN A 
-0091LAMPARAS IMPORTADAS       
-0092" N E I M A N "           
-0093" CINTA AISLADORA "       
-0094" O R G U S "             
-0095" Z E N "                 
-0096ARLES                     
-0097" Z M "                   
+0063" S C H I N C A "         
+0064" S C H I N C A " OFERTAS 
+0065" F L E X I C A M P "     
+0066" F I S P A "             
+0067" P R E C I N T O S  GW " 
+0068FIN                       
+0069" M A R C O "             
+0070REFORMA "R T"             
+0071" B E R U "               
+0072" H A Z E T "             
+0073" V I G O R "             
+0074CINTA                     
+0075DESTELLADORES  R T M      
+0076" T R I A "               
+0077" E R A L S A "           
+0078" Z E N U N "             
+0079MAXICAP                   
+0080" S C H I N C A "         
+0081" Z H "                   
+0082" F A M E A "             
+0083" D A Y C O "             
+0084" B I F O C "             
+0085" V E Y P A "             
+0086" G A R E F "             
+0087" B y C "                 
+0088CAMPOS DE OFERTA          
+0089" E S T A N O L I N "     
+0090J A E G E R               
+0091DIODOS ALTERN - SIN FIN A 
+0092LAMPARAS IMPORTADAS       
+0093" N E I M A N "           
+0094" CINTA AISLADORA "       
+0095" O R G U S "             
+0096" Z E N "                 
+0097ARLES                     
+0098" Z M "                   

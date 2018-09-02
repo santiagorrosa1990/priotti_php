@@ -53,7 +53,7 @@ class DaoProductos {
             break;
             case 4:
             $limite = '';
-            $tipo = 'fecha_agregado > date_sub( now(), interval 2 month) order by fecha_agregado desc AND vigente = 1';
+            $tipo = 'fecha_agregado > date_sub( now(), interval 2 month) AND vigente = 1 order by fecha_agregado desc';
             break;            
         }         
         
