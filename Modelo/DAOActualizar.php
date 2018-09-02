@@ -258,12 +258,15 @@ class DAOActualizar
             } 
         }
         $updateSeconds = round((microtime(true) - $start), 2);
+        $start = microtime(true); 
         self::disableInvalids($listabd, $conexion);
+        $inactives = round((microtime(true) - $start), 2);
         $query = "insert into act_lista(fecha) values(now())";
         echo $nue . ' nuevos.<br>' . $act . ' actualizados.<br>';
         echo "Lista externa: $impListSeconds segundos.<br>";
         echo "Lista bd: $bdListSeconds segundos.<br>";
         echo "Actualizacion: $updateSeconds segundos.<br>";
+        echo "No vigentes: $inactives segundos.<br>";
         $conexion->query($query);
         $conexion->close();
     }
@@ -301,7 +304,7 @@ class DAOActualizar
             self::importar();
             //self::guardarCopia();
             //self::vaciaruploads();
-            $time_elapsed_secs = round((microtime(true) - $start), 0);
+            $time_elapsed_secs = round((microtime(true) - $start), 2);
             return "Lista actualizada en: $time_elapsed_secs segundos";
         } else {
             self::vaciaruploads();
