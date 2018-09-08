@@ -200,7 +200,7 @@ class DAOActualizar
 
         foreach ($listaprecios as $pos => $item) {
             $id_marca = $item["marca"];
-            $listaprecios[$pos]["marca"] = $listamarcas[$id_marca]; 
+            $listaprecios[$pos]["marca"] = $listamarcas[$id_marca];
             $id_rubro = $item["rubro"];
             $listaprecios[$pos]["rubro"] = $listarubros[$id_rubro];
         }
@@ -226,11 +226,13 @@ class DAOActualizar
     {
         $act = 0;
         $nue = 0;
+        $batchInsertQuery = "insert into productos(codigo, marca, rubro, aplicacion, precio_lista, imagen, fecha_agregado) values ";
+        $batchUpdateQuery = "";
         $conexion = Conexion::conectar();
-        $start = microtime(true);  
+        $start = microtime(true);
         $listaimp = self::armarLista();
         $impListSeconds = round((microtime(true) - $start), 2);
-        $start = microtime(true); 
+        $start = microtime(true);
         $listabd = self::listaBd();
         $bdListSeconds = round((microtime(true) - $start), 2);
         $start = microtime(true);
@@ -243,22 +245,28 @@ class DAOActualizar
             $imagen = $imp['imagen'];
             if (!array_key_exists($codigo, $listabd)) { //Si el producto no existe en la bd, se inserta
                 $nue++;
-                $query = "insert into productos(codigo, marca, rubro, aplicacion, precio_lista, imagen, fecha_agregado)
-                values ('$codigo','$marca','$rubro','$desc',$precio,'$imagen', now());";
-                $conexion->query($query);
+                //$query = "insert into productos(codigo, marca, rubro, aplicacion, precio_lista, imagen, fecha_agregado)
+                //values ('$codigo','$marca','$rubro','$desc',$precio,'$imagen', now());";
+                $batchInsertQuery = $batchInsertQuery . "('$codigo','$marca','$rubro','$desc',$precio,'$imagen', now()),";
+                //$conexion->query($query);
             } else {
                 $dbItem = $listabd[$codigo];
                 $listabd[$codigo]['vigente'] = 1;
                 if (self::areNotEqual($dbItem, $imp)) {
                     $act++;
-                    $query = "update productos set marca = '$marca', rubro = '$rubro',
-                            aplicacion = '$desc', precio_lista = " . $precio . ", fecha_modif = now(), imagen = '$imagen' where codigo = '$codigo';";
-                    $conexion->query($query);
+                    //$query = "update productos set marca = '$marca', rubro = '$rubro',
+                     //       aplicacion = '$desc', precio_lista = " . $precio . ", fecha_modif = now(), imagen = '$imagen' where codigo = '$codigo';";
+                    $batchUpdateQuery = $batchUpdateQuery . "update productos set marca = '$marca', rubro = '$rubro',
+                    aplicacion = '$desc', precio_lista = $precio, fecha_modif = now(), imagen = '$imagen' where codigo = '$codigo'; ";
+                    //$conexion->query($query);
                 }
-            } 
+            }
         }
+        $batchInsertQuery = substr($batchInsertQuery, 0, -1); //Quito la ultima coma
+        $conexion->query($batchInsertQuery);
+        $conexion->multi_query($batchUpdateQuery);
         $updateSeconds = round((microtime(true) - $start), 2);
-        $start = microtime(true); 
+        $start = microtime(true);
         self::disableInvalids($listabd, $conexion);
         $inactives = round((microtime(true) - $start), 2);
         $query = "insert into act_lista(fecha) values(now())";
@@ -271,16 +279,18 @@ class DAOActualizar
         $conexion->close();
     }
 
-    private static function disableInvalids($listabd, $conexion){
+    private static function disableInvalids($listabd, $conexion)
+    {
         $query = "update productos set vigente = 1"; //Pongo todos vigentes y despues anulo uno por uno
         $conexion->query($query);
         foreach ($listabd as $item) {
-            if($item['vigente'] == 0){
+            if ($item['vigente'] == 0) {
                 $codigo = $item['codigo'];
-                $query = "update productos set vigente = 0 where codigo = '$codigo'";
-                $conexion->query($query);
+                $batchQuery = $batchQuery . "update productos set vigente = 0 where codigo = '$codigo'; ";
+                //$conexion->query($query);
             }
         }
+        $conexion->multi_query($batchQuery);
     }
 
     private static function areNotEqual($db, $im)
@@ -302,8 +312,8 @@ class DAOActualizar
         if (file_exists("../Resources/uploads/aprecios.txt") && file_exists("../Resources/uploads/alineasx.txt") && file_exists("../Resources/uploads/arubrosx.txt")) {
             $start = microtime(true);
             self::importar();
-            self::guardarCopia();
-            self::vaciaruploads();
+           // self::guardarCopia();
+           // self::vaciaruploads();
             $time_elapsed_secs = round((microtime(true) - $start), 2);
             return "Lista actualizada en: $time_elapsed_secs segundos";
         } else {
