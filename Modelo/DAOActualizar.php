@@ -229,6 +229,8 @@ class DAOActualizar
         $batchInsertQuery = "insert into productos(codigo, marca, rubro, aplicacion, precio_lista, imagen, fecha_agregado) values ";
         $batchUpdateQuery = "";
         $conexion = Conexion::conectar();
+        $conexion->query("insert into act_lista(fecha) values(now())");
+        $conexion->close();
         $start = microtime(true);
         $listaimp = self::armarLista();
         $impListSeconds = round((microtime(true) - $start), 2);
@@ -263,20 +265,25 @@ class DAOActualizar
             }
         }
         $batchInsertQuery = substr($batchInsertQuery, 0, -1); //Quito la ultima coma
+        $conexion = Conexion::conectar();
         $conexion->query($batchInsertQuery);
+        $conexion->close();
+        $conexion = Conexion::conectar();
         $conexion->multi_query($batchUpdateQuery);
+        $conexion->close();
         $updateSeconds = round((microtime(true) - $start), 2);
         $start = microtime(true);
+        $conexion = Conexion::conectar();
         self::disableInvalids($listabd, $conexion);
+        $conexion->close();
         $inactives = round((microtime(true) - $start), 2);
-        $query = "insert into act_lista(fecha) values(now())";
+        //$query = "insert into act_lista(fecha) values(now())";
+        //$conexion->query("insert into act_lista(fecha) values(now())");
         echo $nue . ' nuevos.<br>' . $act . ' actualizados.<br>';
         echo "Lista externa: $impListSeconds segundos.<br>";
         echo "Lista bd: $bdListSeconds segundos.<br>";
         echo "Actualizacion: $updateSeconds segundos.<br>";
         echo "No vigentes: $inactives segundos.<br>";
-        $conexion->query($query);
-        $conexion->close();
     }
 
     private static function disableInvalids($listabd, $conexion)
