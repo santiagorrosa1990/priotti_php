@@ -319,8 +319,8 @@ class DAOActualizar
         if (file_exists("../Resources/uploads/aprecios.txt") && file_exists("../Resources/uploads/alineasx.txt") && file_exists("../Resources/uploads/arubrosx.txt")) {
             $start = microtime(true);
             self::importar();
-           // self::guardarCopia();
-           // self::vaciaruploads();
+            self::guardarCopia();
+            self::vaciaruploads();
             $time_elapsed_secs = round((microtime(true) - $start), 2);
             return "Lista actualizada en: $time_elapsed_secs segundos";
         } else {
