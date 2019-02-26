@@ -7,26 +7,7 @@ class Conexion {
 
     public static function conectar(){     
 
-        /*$user = "root";
-        $pass = "Tato1432";
-        $server = "127.0.0.1";
-        $db = "priotti";*/
-
-        /*$user = "id2833154_santiagorrosa";
-        $pass = "Tato1432";
-        $server = "localhost";
-        $db = "id2833154_priotti";*/
-
-        $user = "SANTIAGO";
-        $pass = "Santi-911";
-        $server = "127.0.0.1";
-        $db = "priotti_php";
-
-        // $user = "felipepr_spauser";
-        // $pass = "Tato1432";
-        // $server = "localhost";
-        // $db = "felipepr_spaweb";
-        //Comentario
+        
     
         self::$mysqli = new mysqli($server, $user, $pass, $db);
 
