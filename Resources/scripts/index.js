@@ -15,6 +15,7 @@ $(document).ready(function () {
     var tipolista = 2;
     var confotos = false;
     var op = false;
+    var historialActualizacion = null;
 
     //CARGA INICIAL
     tablaproductos();
@@ -214,7 +215,7 @@ $(document).ready(function () {
         tabla = $("#tabla").DataTable({
             "bFilter": false,
             "aaSorting": [],
-            "language": {                
+            "language": {
                 "emptyTable": "No hay coincidencias",
                 "info": "Mostrando _START_ a _END_ de _TOTAL_ resultados",
                 "infoEmpty": "No hay resultados",
@@ -328,8 +329,7 @@ $(document).ready(function () {
                     "searchable": false,
                     "orderable": false
                 }
-            ]/*,
-            "order": [[2, 'desc']]*/
+            ]
         });
     }
 
@@ -342,11 +342,8 @@ $(document).ready(function () {
             url: "./Modelo/DAOActualizar.php",
             data: "opc=3",
             success: function (data) {
-                console.log(data);
                 data = JSON.parse(data);
                 $('#fechactualizado').append(' ' + data[1]);
-                //$('#ultimaoferta').text(' ' + data[0]);
-                //$('#ultimalista').text(' ' + data[1]);
             },
             error: function () {
                 toastr.error("Problemas de conexion", "Error");
@@ -417,7 +414,6 @@ $(document).ready(function () {
                     $("#datosingreso").slideDown(500);
                     $("#usuario").val("");
                     $("#clave").val("");
-                    //$('#clientes').addClass('oculto');
                     botoncarrito(false);//Saco el boton de carrito
                     toggleprecios();
                     toggleCarrito(false);
@@ -459,8 +455,6 @@ $(document).ready(function () {
             column.visible(!column.visible());
             var column = tabla.column(7);
             column.visible(!column.visible());
-            /*var column = tabla.column(8);
-            column.visible(!column.visible());*/
         }
     }
 
@@ -620,10 +614,10 @@ $(document).ready(function () {
         var cont = 0;
         var actual = $('#tablac .form-control');
         //Se chequea que el carro no este vacio y que los items no tengan cantidad 0
-            actual.each(function () {
-                cont = cont+1;
-                if ($(this).val() == 0) valido = false;
-            });
+        actual.each(function () {
+            cont = cont + 1;
+            if ($(this).val() == 0) valido = false;
+        });
         if (valido && cont > 0) {
             $.confirm({
                 title: 'Confirmar envío:',
@@ -803,56 +797,60 @@ $(document).ready(function () {
             },
             "columns": [
                 { "data": "fecha", "width": "30%" },
-                { "data": "items", "width": "70%" },       
+                { "data": "items", "width": "70%" },
             ],
-            "order": [[0, 'desc' ]]
+            "order": [[0, 'desc']]
         });
     }
 
 
     //BACK TO TOP EN LA PAGINA CUANDO SE PASA A LA SIGUIENTE HOJA
-    $('#tabla').on( 'page.dt', function () {
+    $('#tabla').on('page.dt', function () {
         $('html, body').animate({
             scrollTop: 300
         }, 300);
-    } );
+    });
 
-    
+
+
+    $('#fechactualizado').on('click', function () {
+        mostrarHistorialActualizacion(); //Hace el ajax cada vez que se hace click, modificar
+    });
+
+    function mostrarHistorialActualizacion() {
+        if (historialActualizacion === null) {
+            $.ajax({
+                method: "POST",
+                url: "./Modelo/DAOActualizar.php",
+                data: "opc=4",
+                success: function (data) {
+                    historialActualizacion = JSON.parse(data);
+                },
+                error: function () {
+                    toastr.error("Problemas de conexion", "Error");
+                }
+            });
+        }
+        $.alert({
+            title: 'Historial de cambios',
+            content: '<table id="example" class="display" width="100%"></table>',
+            columnClass: 'medium',
+            onContentReady: function () {
+                this.$content.find('table').DataTable({
+                    data: historialActualizacion,
+                    bFilter: false,
+                    order: [[0, 'desc']],
+                    columns: [
+                        { title: "Fecha" },
+                        { title: "Cambios" },
+                    ]
+                });
+            }
+        });
+    }
+
+
+
+
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
