@@ -22,6 +22,3 @@ class Importador{
 }
 
 echo Importador::importar();
- 
-
-

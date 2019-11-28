@@ -75,7 +75,6 @@ class DaoPedidos {
     } //Devuelve los items en formato html para enviar por email
 
     private static function cerrarPedido(){
-        //$id = 481;
         $id = $_SESSION["id"]; 
         $query = 'update pedidos set estado = "LISTO", fechapedido = now() where cliente = '.$id.' and estado = "PENDIENTE"';
         Conexion::set($query);
@@ -83,7 +82,6 @@ class DaoPedidos {
     }
 
     private static function agregar($art){
-        //$id = 481;
         $id = $_SESSION["id"];         
         $existe = false;
         $items = self::getItems(); 
@@ -109,7 +107,6 @@ class DaoPedidos {
     } //El item debe ser formato codigo&marca&cant,codio&marca&cant,...
 
     public static function actCantidad($art){  
-        //$id = 481;
         $id = $_SESSION["id"]; 
         $itemsact = "";      
         $items = self::getItems(); 
@@ -137,7 +134,6 @@ class DaoPedidos {
     }   
 
     private static function getItems(){
-        //$id = 481;
         $id = $_SESSION["id"]; 
         self::crearPendiente();        
         $query = 'select items from pedidos where cliente = '.$id.' and estado = "PENDIENTE"';
@@ -152,7 +148,6 @@ class DaoPedidos {
     } //Devuelve string formato: codigo&marca&cant,codigo&marca&cant,...
 
     private static function crearPendiente(){
-        //$id = 481;
         $id = $_SESSION["id"];
         if(!self::hayPendiente($id)){
             $query = 'insert into pedidos (cliente, estado) values ('.$id.', "PENDIENTE")';
@@ -168,7 +163,6 @@ class DaoPedidos {
     } //true si ya hay un pedido pendiente del cliente
 
     private static function update($items){
-        //$id = 481;
         $id = $_SESSION["id"];
         $query = 'update pedidos set items = "'.$items.'" where cliente = '.$id.' and estado = "PENDIENTE"';
         Conexion::set($query);
@@ -176,7 +170,6 @@ class DaoPedidos {
     } //Actualiza el campo items de un pedido
 
     private static function sacar($codigo){
-        //$id = 481;
         $id = $_SESSION["id"]; 
         $itemsact = "";
         $items = self::getItems();                
@@ -194,7 +187,6 @@ class DaoPedidos {
     }    
 
     public static function getJsonHistorico(){
-        //$id = 481;
         $id = $_SESSION["id"]; 
         $query = 'select fechapedido, items from pedidos where cliente = '.$id.' and estado = "LISTO"';
         $resultset = Conexion::get($query);
@@ -211,12 +203,4 @@ class DaoPedidos {
 
 }
 
-//Acceso vía Ajax
 if(isset($_POST["opcpedido"])) echo DaoPedidos::selector($_POST["opcpedido"]);
-
-
-//echo DaoPedidos::getJsonHistorico();
-
-
-
-

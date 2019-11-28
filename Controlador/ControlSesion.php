@@ -129,4 +129,3 @@ class ControlSesion {
 }
 
 echo ControlSesion::selector();
-

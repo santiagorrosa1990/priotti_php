@@ -23,7 +23,7 @@ class Email{
 
     public static function enviarMsj(){       
         if (isset($_REQUEST['email']))  {  
-            $admin_email = "santiagorrosa@hotmail.com";       
+            //$admin_email = "santiagorrosa@hotmail.com";       
             $admin_email = "fpriotti@felipepriotti.com.ar";
             //$email = $_REQUEST['email'];
             $email_exp = '/^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/'; 
@@ -42,7 +42,7 @@ class Email{
 
     private static function enviarPedido(){
         include_once("../Modelo/DAOPedidos.php");            
-        //$admin_email = "santiagorrosa@hotmail.com";
+        $admin_email_dos = "contacto@felipepriotti.com.ar";
         $admin_email = "fpriotti@felipepriotti.com.ar";        
         $subject = 'Pedido de Cliente numero: '.$_SESSION['usuario'].' - '.$_SESSION['nombre'];          
         $message = DAOPedidos::selector(5); //Obtengo el pedido en formato html
@@ -55,6 +55,7 @@ class Email{
             $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
             //Send email
             mail($admin_email, $subject, $message, $headers);
+            mail($admin_email_dos, $subject, $message, $headers);
             return "Su pedido ha sido enviado!";
         }
         return "El carrito está vacío!";

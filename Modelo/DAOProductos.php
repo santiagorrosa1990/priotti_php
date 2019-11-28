@@ -157,7 +157,7 @@ class DaoProductos {
             try{                
                 $conexion = Conexion::conectar();
                 $tabla[] = ["codigo"=>"CODIGO", "marca"=>"MARCA", "rubro"=>"RUBRO", "aplicacion"=>"APLICACION", "precio_lista"=>"PRECIO"];         
-                $query = "select codigo, marca, rubro, aplicacion, precio_lista from productos order by marca, rubro, codigo";
+                $query = "select codigo, marca, rubro, aplicacion, precio_lista from productos where vigente != 0 order by marca, rubro, codigo";
                 $resultset = $conexion->query($query);
                 while($row = $resultset->fetch_assoc()) {
                     $row['precio_lista'] = number_format($row['precio_lista'] * $coeficiente, 2, ',', ''); 
@@ -181,5 +181,3 @@ class DaoProductos {
 echo DaoProductos::selector();
 
 //echo DaoProductos::obtenerLista();
-
-

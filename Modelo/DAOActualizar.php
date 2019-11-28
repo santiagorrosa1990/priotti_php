@@ -30,6 +30,9 @@ class DAOActualizar
                 case 3:
                     return self::getFechasAct();
                     break;
+                case 4:
+                    return self::getHistorialCambios();
+                    break;
                 default:
                     return 'No se eligió opción';
                     break;
@@ -37,6 +40,27 @@ class DAOActualizar
         } else {
             return 'No autorizado';
         }
+    }
+
+    private static function getHistorialCambios(){
+        $conexion = Conexion::conectar();
+        $query = "select fecha, cambios from act_lista order by fecha desc limit 10";
+        $resultset = $conexion->query($query);
+        try{
+            $resultset = $conexion->query($query);            
+            if($resultset->num_rows!=0){
+                while($row = $resultset->fetch_assoc()) {                    
+                    $tabla[] = [$row["fecha"], $row["cambios"]];                                                            
+                }
+            }else{
+                return '[]';            
+            }
+        }catch(Exception $e){
+            return $e;
+        }; 
+        $resultset->free();
+        $conexion->close();
+        return json_encode($tabla);
     }
 
     private static function actualizarOfertas()
@@ -79,19 +103,20 @@ class DAOActualizar
     private static function getFechasAct()
     {
         $conexion = Conexion::conectar();
+        $query = "select * from act_lista where fecha = ( select max(fecha) as fecha from act_lista)";
+        $result = $conexion->query($query);
+        $row = $result->fetch_assoc();
+        $flista = $row["fecha"];
+        $cambios = $row["cambios"];
+        $result->free();
         $query = "select max(fecha) as fecha from act_oferta";
         $result = $conexion->query($query);
         $row = $result->fetch_assoc();
         $foferta = $row["fecha"];
         $result->free();
-        $query = "select max(fecha) as fecha from act_lista";
-        $result = $conexion->query($query);
-        $row = $result->fetch_assoc();
-        $flista = $row["fecha"];
-        $result->free();
         $conexion->close();
-        $fechas = array($foferta, $flista); //Se devuelven las fechas de las actualizaciones últimas
-        return json_encode($fechas);
+        $fechas = array($foferta, $flista, $cambios); //Se devuelven las fechas de las actualizaciones últimas
+        return json_encode($fechas); //Y la lista de marcas que cambiaron los precios
 
     }
 
@@ -134,8 +159,7 @@ class DAOActualizar
             $aux = fgets($txtrubros);
             if ($aux != "") {
                 $id_rubro = substr($aux, 0, 7);
-                $desc = utf8_decode(str_replace("'", "`", substr($aux, 7)));
-                // $listarubros[] = ['id_rubro'=>$id_rubro, 'desc'=>$desc];
+                $desc = utf8_decode(rtrim(str_replace("'", "`", substr($aux, 7))));
                 $listarubros[$id_rubro] = $desc;
             }
         }
@@ -158,7 +182,6 @@ class DAOActualizar
                 } else if ($nombre == "FUSIBLESFICHADESNUDOS") {
                     $nombre = "GEN-ROD";
                 }
-                //$listamarcas[] =  ['id_marca'=>$id_marca, 'nombre'=>$nombre];
                 $listamarcas[$id_marca] = $nombre;
             }
         }
@@ -177,7 +200,7 @@ class DAOActualizar
                 $rubro = substr($aux, 0, 7); //Se borran los ceros a la izq
                 $marca = substr($aux, 0, 4);
                 $codigo = rtrim(substr($aux, 7, 20));
-                $desc = utf8_decode(str_replace("'", "`", substr($aux, 27, 35)));
+                $desc = utf8_decode(rtrim(str_replace("'", "`", substr($aux, 27, 35))));
                 $precio = substr($aux, 62, 10);
                 $precio = substr($precio, 0, -2) . "." . substr($precio, -2); //La coma
                 $precio = ltrim($precio, "0");
@@ -228,16 +251,9 @@ class DAOActualizar
         $nue = 0;
         $batchInsertQuery = "insert into productos(codigo, marca, rubro, aplicacion, precio_lista, imagen, fecha_agregado) values ";
         $batchUpdateQuery = "";
-        $conexion = Conexion::conectar();
-        $conexion->query("insert into act_lista(fecha) values(now())");
-        $conexion->close();
-        $start = microtime(true);
+        $cambios = [];
         $listaimp = self::armarLista();
-        $impListSeconds = round((microtime(true) - $start), 2);
-        $start = microtime(true);
         $listabd = self::listaBd();
-        $bdListSeconds = round((microtime(true) - $start), 2);
-        $start = microtime(true);
         foreach ($listaimp as $imp) {
             $codigo = $imp['codigo'];
             $marca = $imp['marca'];
@@ -247,57 +263,60 @@ class DAOActualizar
             $imagen = $imp['imagen'];
             if (!array_key_exists($codigo, $listabd)) { //Si el producto no existe en la bd, se inserta
                 $nue++;
-                //$query = "insert into productos(codigo, marca, rubro, aplicacion, precio_lista, imagen, fecha_agregado)
-                //values ('$codigo','$marca','$rubro','$desc',$precio,'$imagen', now());";
                 $batchInsertQuery = $batchInsertQuery . "('$codigo','$marca','$rubro','$desc',$precio,'$imagen', now()),";
-                //$conexion->query($query);
             } else {
                 $dbItem = $listabd[$codigo];
                 $listabd[$codigo]['vigente'] = 1;
                 if (self::areNotEqual($dbItem, $imp)) {
                     $act++;
-                    //$query = "update productos set marca = '$marca', rubro = '$rubro',
-                     //       aplicacion = '$desc', precio_lista = " . $precio . ", fecha_modif = now(), imagen = '$imagen' where codigo = '$codigo';";
                     $batchUpdateQuery = $batchUpdateQuery . "update productos set marca = '$marca', rubro = '$rubro',
                     aplicacion = '$desc', precio_lista = $precio, fecha_modif = now(), imagen = '$imagen' where codigo = '$codigo'; ";
-                    //$conexion->query($query);
+                    $cambios[] = $marca;
                 }
             }
         }
-        $batchInsertQuery = substr($batchInsertQuery, 0, -1); //Quito la ultima coma
-        $conexion = Conexion::conectar();
-        $conexion->query($batchInsertQuery);
-        $conexion->close();
         $conexion = Conexion::conectar();
         $conexion->multi_query($batchUpdateQuery);
         $conexion->close();
-        $updateSeconds = round((microtime(true) - $start), 2);
-        $start = microtime(true);
         $conexion = Conexion::conectar();
-        self::disableInvalids($listabd, $conexion);
+        $batchInsertQuery = substr($batchInsertQuery, 0, -1); //Quito la ultima coma
+        $conexion->query($batchInsertQuery);
         $conexion->close();
-        $inactives = round((microtime(true) - $start), 2);
-        //$query = "insert into act_lista(fecha) values(now())";
-        //$conexion->query("insert into act_lista(fecha) values(now())");
+        self::disableInvalids($listabd);
+        self::setDate(self::formatStringCambios(array_unique($cambios)));
         echo $nue . ' nuevos.<br>' . $act . ' actualizados.<br>';
-        echo "Lista externa: $impListSeconds segundos.<br>";
-        echo "Lista bd: $bdListSeconds segundos.<br>";
-        echo "Actualizacion: $updateSeconds segundos.<br>";
-        echo "No vigentes: $inactives segundos.<br>";
     }
 
-    private static function disableInvalids($listabd, $conexion)
+    private static function formatStringCambios($cambios)
     {
+        $stringCambios = '';
+        foreach ($cambios as $cambio) {
+            $stringCambios .= $cambio . ", ";
+        }
+        return $stringCambios;
+    }
+
+    private static function setDate($stringCambios)
+    {
+        $conexion = Conexion::conectar();
+        $conexion->query("insert into act_lista(fecha, cambios) values(now(),'$stringCambios')");
+        $conexion->close();
+    }
+
+    private static function disableInvalids($listabd)
+    {
+        $conexion = Conexion::conectar();
         $query = "update productos set vigente = 1"; //Pongo todos vigentes y despues anulo uno por uno
         $conexion->query($query);
         foreach ($listabd as $item) {
             if ($item['vigente'] == 0) {
                 $codigo = $item['codigo'];
                 $batchQuery = $batchQuery . "update productos set vigente = 0 where codigo = '$codigo'; ";
-                //$conexion->query($query);
             }
         }
+       // error_log($batchQuery);
         $conexion->multi_query($batchQuery);
+        $conexion->close();
     }
 
     private static function areNotEqual($db, $im)
