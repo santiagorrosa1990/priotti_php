@@ -308,6 +308,7 @@ class DAOActualizar
         $conexion = Conexion::conectar();
         $query = "update productos set vigente = 1"; //Pongo todos vigentes y despues anulo uno por uno
         $conexion->query($query);
+        $batchQuery = "";
         foreach ($listabd as $item) {
             if ($item['vigente'] == 0) {
                 $codigo = $item['codigo'];
