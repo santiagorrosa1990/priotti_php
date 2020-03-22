@@ -7,10 +7,10 @@ class Conexion {
 
     public static function conectar(){     
 
-        $user = "felipepr_test";
-        $pass = "Tato-1432";
-        $server = "felipepriotti.com.ar";
-        $db = "felipepr_test";
+         $user = "felipepr_test";
+         $pass = "Tato-1432";
+         $server = "felipepriotti.com.ar";
+         $db = "felipepr_test";
        
         self::$mysqli = new mysqli($server, $user, $pass, $db);
 
