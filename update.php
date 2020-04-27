@@ -4,9 +4,9 @@ include "./Modelo/Conexion.php";
 
 $data = json_decode(file_get_contents('php://input', true));
 insert($data->{'insert'});
-update($data->{'update'});
-delete($data->{'delete'});
-setDate($data->{'novelties'});
+//update($data->{'update'});
+//delete($data->{'delete'});
+//setDate($data->{'novelties'});
 
 function insert($list)
 {
@@ -23,9 +23,19 @@ function insert($list)
     $query = $query . "('$codigo','$marca','$rubro','$descripcion',$precio,$precio_oferta,'$imagen', now(), '$info'),";
     $query = substr($query, 0, -1);
   }
-  $conexion = Conexion::conectar();
-  $conexion->query($query);
-  $conexion->close();
+  $query = $query . ' ON DUPLICATE KEY UPDATE ' .
+        'marca = VALUES(marca), '.
+        'rubro = VALUES(rubro), '.
+        'aplicacion = VALUES(aplicacion), '.
+        'precio_lista = VALUES(precio_lista), '.
+        'precio_oferta = VALUES(precio_oferta), '.
+        'imagen = VALUES(imagen), '.
+        'fecha_agregado = VALUES(fecha_agregado), '.
+        'info = VALUES(info);';
+        echo $query;
+  //$conexion = Conexion::conectar();
+  //$conexion->query($query);
+  //$conexion->close();
 }
 
 function update($list)
