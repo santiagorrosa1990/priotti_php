@@ -32,10 +32,9 @@ function insert($list)
         'imagen = VALUES(imagen), '.
         'fecha_agregado = VALUES(fecha_agregado), '.
         'info = VALUES(info);';
-        echo $query;
-  //$conexion = Conexion::conectar();
-  //$conexion->query($query);
-  //$conexion->close();
+  $conexion = Conexion::conectar();
+  $conexion->query($query);
+  $conexion->close();
 }
 
 function update($list)
