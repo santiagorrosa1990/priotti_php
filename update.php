@@ -3,10 +3,10 @@ session_start();
 include "./Modelo/Conexion.php";
 
 $data = json_decode(file_get_contents('php://input', true));
+setDate($data->{'novelties'});
+delete($data->{'delete'});
 insert($data->{'insert'});
-//update($data->{'update'});
-//delete($data->{'delete'});
-//setDate($data->{'novelties'});
+update($data->{'update'});
 
 function insert($list)
 {
