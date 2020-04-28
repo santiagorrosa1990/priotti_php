@@ -5,7 +5,7 @@ include "./Modelo/Conexion.php";
 $data = json_decode(file_get_contents('php://input', true));
 setDate($data->{'novelties'});
 delete($data->{'delete'});
-insert($data->{'insert'});
+//insert($data->{'insert'});
 update($data->{'update'});
 
 function insert($list)
@@ -21,8 +21,8 @@ function insert($list)
     $info = $it->{'info'};
     $imagen = $it->{'imagen'};
     $query = $query . "('$codigo','$marca','$rubro','$descripcion',$precio,$precio_oferta,'$imagen', now(), '$info'),";
-    $query = substr($query, 0, -1);
   }
+  $query = substr($query, 0, -1);
   $query = $query . ' ON DUPLICATE KEY UPDATE ' .
         'marca = VALUES(marca), '.
         'rubro = VALUES(rubro), '.
