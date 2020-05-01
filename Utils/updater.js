@@ -1,5 +1,3 @@
-//Script que lee los archivos xls que larga el sistema biglia
-
 const fs = require('fs');
 var mysql = require('mysql');
 const axios = require('axios')
@@ -8,11 +6,13 @@ var XLSX = require('xlsx')
 buildListFromExcel('exports/infopagina-22-04-20.xls', function (actualList) {
     buildListFromExcel('exports/infopagina-26-04-20.xls', function (newList) {
         let data = buildUpdateData(actualList, newList);
-        console.log("UPDATE size: "+data.update.length);
-        console.log("DELETE size: "+data.delete.length);
-        console.log("INSERT size: "+data.insert.length);
-        //writeToFile(data, 'diff.json');
-        postToSite(data);
+        console.log("UPDATE size: " + data.update.length);
+        console.log("DELETE size: " + data.delete.length);
+        console.log("INSERT size: " + data.insert.length);
+        writeToFile(actualList, 'actual.json');
+        writeToFile(newList, 'nuevo.json');
+        writeToFile(data, 'diff.json');
+        //postToSite(data);
     });
 });
 
@@ -41,7 +41,7 @@ function buildUpdateData(currentList, newList) {
     Object.keys(newList).forEach(function (key) {
         if (currentList[key] != null) {
             if (JSON.stringify(currentList[key]) != JSON.stringify(newList[key])) {
-                diffList.update.push(newList[key]);
+                diffList.update.push(buildChangesOnly(currentList[key], newList[key]));
                 diffList.novelties.push(newList[key].marca)
             }
             currentList[key].present = true;
@@ -58,6 +58,17 @@ function buildUpdateData(currentList, newList) {
     diffList.novelties = [...new Set(diffList.novelties)]
     return diffList;
 };
+
+function buildChangesOnly(oldItem, newItem) {
+    diffItem = {};
+    diffItem['codigo'] = newItem['codigo'];
+    Object.keys(newItem).forEach(function (key) {
+        if (JSON.stringify(newItem[key]) != JSON.stringify(oldItem[key])) {
+            diffItem[key] = newItem[key];
+        };
+    });
+    return diffItem;
+}
 
 function fixCharacters(text) {
     text = (text + '').replace(/�/g, "");
