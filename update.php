@@ -24,14 +24,14 @@ function insert($list)
   }
   $query = substr($query, 0, -1);
   $query = $query . ' ON DUPLICATE KEY UPDATE ' .
-        'marca = VALUES(marca), '.
-        'rubro = VALUES(rubro), '.
-        'aplicacion = VALUES(aplicacion), '.
-        'precio_lista = VALUES(precio_lista), '.
-        'precio_oferta = VALUES(precio_oferta), '.
-        'imagen = VALUES(imagen), '.
-        'fecha_agregado = VALUES(fecha_agregado), '.
-        'info = VALUES(info);';
+    'marca = VALUES(marca), ' .
+    'rubro = VALUES(rubro), ' .
+    'aplicacion = VALUES(aplicacion), ' .
+    'precio_lista = VALUES(precio_lista), ' .
+    'precio_oferta = VALUES(precio_oferta), ' .
+    'imagen = VALUES(imagen), ' .
+    'fecha_agregado = VALUES(fecha_agregado), ' .
+    'info = VALUES(info);';
   $conexion = Conexion::conectar();
   $conexion->query($query);
   $conexion->close();
@@ -40,22 +40,39 @@ function insert($list)
 function update($list)
 {
   $query = "";
-  foreach ($list as $it) {
-    $codigo = $it->{'codigo'};
-    $descripcion = $it->{'descripcion'};
-    $marca = $it->{'marca'};
-    $rubro = $it->{'rubro'};
-    $precio = $it->{'precio'};
-    $precio_oferta = $it->{'precio_oferta'};
-    $info = $it->{'info'};
-    $imagen = $it->{'imagen'};
-    $query = $query . "UPDATE productos set marca = '$marca', rubro = '$rubro',
-                    aplicacion = '$descripcion', precio_lista = $precio, precio_oferta = $precio_oferta,
-                     fecha_modif = now(), imagen = '$imagen', info = '$info' WHERE codigo = '$codigo'; ";
+  foreach ($list as $item) {
+    $query = $query . createUpdateLine($item);
   }
   $conexion = Conexion::conectar();
   $conexion->multi_query($query);
   $conexion->close();
+}
+
+function createUpdateLine($item)
+{
+  $line = "UPDATE productos set ";
+  $array = [
+    "marca" => "marca",
+    "rubro" => "rubro",
+    "descripcion" => "aplicacion",
+    "precio" => "precio_lista",
+    "precio_oferta" => "precio_oferta",
+    "info" => "info",
+    "imagen" => "imagen"
+  ];
+  foreach ($item as $key => $value) {
+    if ($key != 'codigo') {
+      $column = $array[$key];
+      if (in_array($key, ["precio", "precio_oferta"])) {
+        $line = $line . "$column = $value, ";
+      } else {
+        $line = $line . "$column = '$value', ";
+      }
+    }
+  }
+  $codigo = $item->{'codigo'};
+  $line = $line . "fecha_modif = now() WHERE codigo = '$codigo'; ";
+  return $line;
 }
 
 function delete($list)
@@ -73,7 +90,7 @@ function delete($list)
 function setDate($list)
 {
   $string = "";
-  foreach ($list as $it){
+  foreach ($list as $it) {
     $string .= $it . ", ";
   }
   $conexion = Conexion::conectar();

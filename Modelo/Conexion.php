@@ -22,14 +22,11 @@ class Conexion {
     } 
 
     public static function get($query){
-        //Nuevo metodo que reemplaza a "conectar()"
         self::$conexion = self::conectar();
         self::$resultset = self::$conexion->query($query);         
         if( self::$resultset->num_rows < 1){                     
             return false;
-        } 
-        //$resultset->free();          
-        //$conexion->close();               
+        }             
         return self::$resultset;
     }
 
