@@ -3,18 +3,27 @@ var mysql = require('mysql');
 const axios = require('axios')
 var XLSX = require('xlsx')
 
-buildListFromExcel('exports/infopagina-22-04-20.xls', function (actualList) {
-    buildListFromExcel('exports/infopagina-26-04-20.xls', function (newList) {
-        let data = buildUpdateData(actualList, newList);
-        console.log("UPDATE size: " + data.update.length);
-        console.log("DELETE size: " + data.delete.length);
-        console.log("INSERT size: " + data.insert.length);
-        writeToFile(actualList, 'actual.json');
-        writeToFile(newList, 'nuevo.json');
-        writeToFile(data, 'diff.json');
-        //postToSite(data);
+fs.readdir('./exports/', (err, files) => {
+    let dates = [];
+    files.forEach(file => {
+        dates.push(file.substring(0, file.length - 4));
     });
+    dates.sort(function (a, b) { return b - a })
+    console.log("mas nuevo: " + dates[0]);
+    console.log("segundo mas nuevo: " + dates[1]);
+    let actualList = buildListFromExcel('exports/' + dates[1] + '.xls')
+    let newList = buildListFromExcel('exports/' + dates[0] + '.xls')
+    let data = buildUpdateData(actualList, newList);
+    console.log("UPDATE size: " + data.update.length);
+    console.log("DELETE size: " + data.delete.length);
+    console.log("INSERT size: " + data.insert.length);
+    writeToFile(actualList, 'actual.json');
+    writeToFile(newList, 'nuevo.json');
+    writeToFile(data, 'diff.json');
+    //postToSite(data);
 });
+
+
 
 function postToSite(data) {
     axios.post('http://www.felipepriotti.com.ar/update.php', data)
@@ -91,7 +100,7 @@ function writeToFile(input, filename) {
     });
 }
 
-function buildListFromExcel(filename, callback) {
+function buildListFromExcel(filename) {
     var workbook = XLSX.readFile(filename);
     var sheet_name_list = workbook.SheetNames;
     var xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
@@ -109,7 +118,7 @@ function buildListFromExcel(filename, callback) {
             imagen: imagen
         };
     });
-    callback(json);
+    return json;
 }
 
 function buildInfo(row) {
