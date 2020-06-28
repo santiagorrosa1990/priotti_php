@@ -132,3 +132,7 @@ function buildInfo(row) {
     return out;
 }
 
+function applyOffers(){
+    
+}
+
